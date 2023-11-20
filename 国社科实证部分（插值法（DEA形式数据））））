@@ -1,0 +1,23 @@
+import pandas as pd
+
+# 读取Excel文件
+file_path = r'C:\Users\邓和顺\Desktop\国家社实证部分科\分行业数据\INDUSTRY_DATA1.xlsx'
+df = pd.read_excel(file_path)
+
+# 根据"AREA"和"INDUSTRY"进行分组
+groups = df.groupby(['AREA', 'INDUSTRY'])
+
+# 需要插值的列
+columns_to_interpolate = ['labor', 'capital', 'desirable_outcome']
+
+# 定义插值函数
+def interpolate_group(group):
+    group[columns_to_interpolate] = group[columns_to_interpolate].interpolate(method='linear', limit_direction='both')
+    return group
+
+# 对每个分组应用插值函数
+df = groups.apply(interpolate_group)
+
+# 输出到新的Excel文件
+output_file_path = r'C:\Users\邓和顺\Desktop\国家社实证部分科\分行业数据\INDUSTRY_DATA1_interpolated.xlsx'
+df.to_excel(output_file_path, index=False)
