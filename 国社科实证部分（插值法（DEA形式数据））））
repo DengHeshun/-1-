@@ -21,3 +21,36 @@ df = groups.apply(interpolate_group)
 # 输出到新的Excel文件
 output_file_path = r'C:\Users\邓和顺\Desktop\国家社实证部分科\分行业数据\INDUSTRY_DATA1_interpolated.xlsx'
 df.to_excel(output_file_path, index=False)
+
+
+import pandas as pd
+
+# 读取Excel文件
+file_path = r'C:\Users\邓和顺\Desktop\国家社实证部分科\分行业数据\INDUSTRY_DATA1_interpolated.xlsx'
+df = pd.read_excel(file_path)
+
+# 需要求和的列
+columns_to_sum = ['labor', 'capital', 'desirable_outcome', 'co', 'energy']
+
+# 将"YEAR"和"INDUSTRY"列合并为组名
+df['group'] = df['INDUSTRY'] + df['YEAR'].astype(str)
+
+# 根据组名进行分组
+groups = df.groupby('group')
+
+# 定义求和函数
+def sum_group(group):
+    # 创建一个新行，存放求和结果
+    sum_row = group[columns_to_sum].sum().to_frame().T
+    # 将组名作为新行的索引
+    sum_row['group'] = group['group'].iloc[0]
+    # 重新设置列的顺序，将组名移至第一列
+    sum_row = sum_row[['group'] + columns_to_sum]
+    return sum_row
+
+# 对每个分组应用求和函数
+result_df = groups.apply(sum_group).reset_index(drop=True)
+
+# 输出到新的Excel文件
+output_file_path = r'C:\Users\邓和顺\Desktop\国家社实证部分科\分行业数据\INDUSTRY_DATA1_sum.xlsx'
+result_df.to_excel(output_file_path, index=False)
